@@ -20,6 +20,9 @@ package org.apache.maven.surefire.api.testset;
  */
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.maven.surefire.api.util.RunOrder;
 
 import static org.apache.maven.surefire.api.util.RunOrder.ALPHABETICAL;
@@ -36,26 +39,42 @@ public final class RunOrderParameters
 
     private final Long runOrderRandomSeed;
 
+    private final String specifiedRunOrder;
+
     public RunOrderParameters( RunOrder[] runOrder, File runStatisticsFile )
     {
-        this( runOrder, runStatisticsFile, null );
+        this( runOrder, runStatisticsFile, null, null );
     }
 
     public RunOrderParameters( String runOrder, File runStatisticsFile )
     {
-        this( runOrder, runStatisticsFile, null );
+        this( runOrder, runStatisticsFile, null, null );
     }
 
     public RunOrderParameters( String runOrder, File runStatisticsFile, Long runOrderRandomSeed )
     {
-        this( runOrder == null ? DEFAULT : RunOrder.valueOfMulti( runOrder ), runStatisticsFile, runOrderRandomSeed );
+        this( runOrder, runStatisticsFile, runOrderRandomSeed, null );
     }
 
     public RunOrderParameters( RunOrder[] runOrder, File runStatisticsFile, Long runOrderRandomSeed )
     {
+        this( runOrder, runStatisticsFile, runOrderRandomSeed, null );
+    }
+
+    public RunOrderParameters( RunOrder[] runOrder, File runStatisticsFile, Long runOrderRandomSeed,
+                               String specifiedRunOrder )
+    {
         this.runOrder = runOrder;
         this.runStatisticsFile = runStatisticsFile;
         this.runOrderRandomSeed = runOrderRandomSeed;
+        this.specifiedRunOrder = specifiedRunOrder;
+    }
+
+    public RunOrderParameters( String runOrder, File runStatisticsFile, Long runOrderRandomSeed,
+                               String specifiedRunOrder )
+    {
+        this( runOrder == null ? DEFAULT : RunOrder.valueOfMulti( runOrder ), runStatisticsFile, runOrderRandomSeed,
+            specifiedRunOrder );
     }
 
     public static RunOrderParameters alphabetical()
@@ -76,5 +95,23 @@ public final class RunOrderParameters
     public File getRunStatisticsFile()
     {
         return runStatisticsFile;
+    }
+
+    public List<ResolvedTest> resolvedSpecifiedRunOrder()
+    {
+        if ( specifiedRunOrder != null )
+        {
+            TestListResolver testListResolver = new TestListResolver( specifiedRunOrder );
+            return new ArrayList<>( testListResolver.getIncludedPatterns() );
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    public String getSpecifiedRunOrder()
+    {
+        return specifiedRunOrder;
     }
 }
