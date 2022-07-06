@@ -60,6 +60,7 @@ import static org.apache.maven.surefire.booter.BooterConstants.RUN_ORDER_RANDOM_
 import static org.apache.maven.surefire.booter.BooterConstants.REPORTSDIRECTORY;
 import static org.apache.maven.surefire.booter.BooterConstants.REQUESTEDTEST;
 import static org.apache.maven.surefire.booter.BooterConstants.RERUN_FAILING_TESTS_COUNT;
+import static org.apache.maven.surefire.booter.BooterConstants.SPECIFIED_RUN_ORDER;
 import static org.apache.maven.surefire.booter.BooterConstants.RUN_ORDER;
 import static org.apache.maven.surefire.booter.BooterConstants.RUN_STATISTICS_FILE;
 import static org.apache.maven.surefire.booter.BooterConstants.SHUTDOWN;
@@ -162,6 +163,7 @@ class BooterSerializer
             properties.setProperty( RUN_ORDER, RunOrder.asString( runOrderParameters.getRunOrder() ) );
             properties.setProperty( RUN_STATISTICS_FILE, runOrderParameters.getRunStatisticsFile() );
             properties.setProperty( RUN_ORDER_RANDOM_SEED, runOrderParameters.getRunOrderRandomSeed() );
+            properties.setProperty( SPECIFIED_RUN_ORDER, runOrderParameters.getSpecifiedRunOrder() );
         }
 
         ReporterConfiguration reporterConfiguration = providerConfiguration.getReporterConfiguration();

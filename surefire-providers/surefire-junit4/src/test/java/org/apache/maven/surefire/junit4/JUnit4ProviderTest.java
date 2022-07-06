@@ -22,8 +22,10 @@ package org.apache.maven.surefire.junit4;
 import org.apache.maven.surefire.api.booter.BaseProviderFactory;
 import org.apache.maven.surefire.api.testset.RunOrderParameters;
 import org.apache.maven.surefire.api.testset.TestRequest;
+import org.apache.maven.surefire.api.util.DefaultRunOrderCalculator;
 import org.junit.Test;
 import org.junit.runner.Description;
+import org.junit.runner.Request;
 
 import java.io.File;
 import java.util.HashMap;
@@ -80,4 +82,5 @@ public class JUnit4ProviderTest
         Description b = createSuiteDescription( B.class );
         assertThat( d.getChildren(), contains( a, b ) );
     }
+
 }

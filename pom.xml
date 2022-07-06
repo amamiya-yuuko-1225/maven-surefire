@@ -97,7 +97,7 @@
     <mavenSharedUtilsVersion>3.3.4</mavenSharedUtilsVersion>
     <powermockVersion>2.0.9</powermockVersion>
     <jacocoVersion>0.8.8</jacocoVersion>
-    <surefire-shared-utils.version>${project.version}</surefire-shared-utils.version>
+    <surefire-shared-utils.version>3.0.0-M8-SNAPSHOT</surefire-shared-utils.version>
     <maven.surefire.scm.devConnection>scm:git:https://gitbox.apache.org/repos/asf/maven-surefire.git</maven.surefire.scm.devConnection>
     <maven.site.path>surefire-archives/surefire-LATEST</maven.site.path>
     <maven.compiler.testSource>1.${javaVersion}</maven.compiler.testSource>
