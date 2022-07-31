@@ -36,20 +36,25 @@ import static org.apache.maven.surefire.api.testset.TestListResolver.optionallyW
 import static org.apache.maven.surefire.api.util.TestsToRun.fromClass;
 import static org.apache.maven.surefire.shared.utils.StringUtils.isBlank;
 import static org.junit.platform.engine.discovery.DiscoverySelectors.selectClass;
+import static org.junit.platform.engine.discovery.DiscoverySelectors.selectMethod;
 import static org.junit.platform.engine.discovery.DiscoverySelectors.selectUniqueId;
 import static org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder.request;
 
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.UncheckedIOException;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
-import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import org.apache.maven.surefire.api.provider.AbstractProvider;
 import org.apache.maven.surefire.api.provider.ProviderParameters;
@@ -212,8 +217,41 @@ public class JUnitPlatformProvider
         if ( testsToRun.allowEagerReading() )
         {
             List<DiscoverySelector> selectors = new ArrayList<>();
+            Comparator<String> comparator = parameters.getRunOrderCalculator().comparatorForTestMethods();
             testsToRun.iterator()
-                .forEachRemaining( c -> selectors.add( selectClass( c.getName() )  ) );
+                .forEachRemaining( c ->
+                {
+                    List<Method> methods = stream( c.getMethods() )
+                        .filter( m -> //Select methods with annotation @Test.
+                            // The core problem unresolved to order test methods.
+                        {
+                            for ( Annotation a : m.getDeclaredAnnotations() )
+                            {
+                                if ( a.toString().contains( "Test" ) )//Temporarily hard-coded.
+                                {
+                                    return true;
+                                }
+                            }
+                            return false;
+                        } )
+                        .sorted( ( m1, m2 ) -> //Apply run order for methods
+                        {
+                            if ( comparator != null )
+                            {
+                                return comparator.compare( m1.getName() + "(" + c.getName() + ")",
+                                    m2.getName() + "(" + c.getName() + ")" );
+                            }
+                            else
+                            {
+                                return 0;
+                            }
+                        } )
+                        .collect( Collectors.toList() );
+                    for ( Method method : methods )
+                    {
+                        selectors.add( selectMethod( c.getName() + "#" + method.getName() ) );
+                    }
+                } );
 
             LauncherDiscoveryRequestBuilder builder = request()
                 .filters( filters )
